@@ -1,0 +1,68 @@
+services:
+  cosmosdb:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+    container_name: fiapx-cosmos
+    tty: true
+    mem_limit: 3g
+    ports:
+      - "8081:8081"
+      - "10250-10255:10250-10255"
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+    volumes:
+      - ./data/cosmos:/data/cosmos
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k https://localhost:8081/_explorer/index.html || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: fiapx-storage
+    ports:
+      - "10000:10000"
+    command: "azurite-blob --blobHost 0.0.0.0"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "10000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  servicebus:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    container_name: fiapx-servicebus
+    ports:
+      - "5672:5672"
+    environment:
+      - ACCEPT_EULA=Y
+      - SQL_SERVER=fiapx-sb-db
+      - MSSQL_SA_PASSWORD=StrongPassword123!
+    volumes:
+      - ./infra/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json
+    depends_on:
+      sb-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/5672'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  sb-db:
+    image: "mcr.microsoft.com/azure-sql-edge:latest"
+    container_name: fiapx-sb-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=StrongPassword123!
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'StrongPassword123!' -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s

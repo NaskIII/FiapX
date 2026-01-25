@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "FiapX.API": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7150",
+      "launchBrowser": false
+    }
+  }
+}
