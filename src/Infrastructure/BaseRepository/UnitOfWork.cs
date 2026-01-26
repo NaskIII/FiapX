@@ -1,5 +1,7 @@
-﻿using FiapX.Core.Interfaces.UnityOfWork;
+﻿using FiapX.Application;
+using FiapX.Core.Interfaces.UnityOfWork;
 using FiapX.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FiapX.Infrastructure.BaseRepository
 {
@@ -14,7 +16,14 @@ namespace FiapX.Infrastructure.BaseRepository
 
         public async Task<bool> CommitAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.SaveChangesAsync(cancellationToken) > 0;
+            try
+            {
+                return await _context.SaveChangesAsync(cancellationToken) > 0;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConcurrencyException("Conflito de concorrência detectado ao salvar dados.");
+            }
         }
 
         public Task BeginTransactionAsync()

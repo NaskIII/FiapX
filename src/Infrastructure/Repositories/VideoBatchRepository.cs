@@ -32,5 +32,12 @@ namespace FiapX.Infrastructure.Repositories
 
             return batch;
         }
+
+        public async Task ClearChangeTracker()
+        {
+            _context.ChangeTracker.Clear();
+
+            await Task.CompletedTask;
+        }
     }
 }

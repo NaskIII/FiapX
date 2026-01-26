@@ -1,5 +1,6 @@
 ﻿using FiapX.Application.Interfaces;
 using FiapX.Application.UseCases.Batch;
+using FiapX.Application.UseCases.VideoProcessing;
 using FiapX.Application.UseCases.VideoUpload;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IGetBatchStatusUseCase, GetBatchStatusUseCase>();
         services.AddScoped<IUploadVideoUseCase, UploadVideoUseCase>();
+        services.AddScoped<IProcessVideoUseCase, ProcessVideoUseCase>();
 
         return services;
     }

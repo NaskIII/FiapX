@@ -6,5 +6,6 @@ namespace FiapX.Core.Interfaces.Repositories
     public interface IVideoBatchRepository : IRepository<VideoBatch>
     {
         public Task<VideoBatch?> GetBatchWithVideosAsync(Guid batchId);
+        public Task ClearChangeTracker();
     }
 }

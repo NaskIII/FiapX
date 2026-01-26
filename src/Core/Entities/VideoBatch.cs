@@ -30,15 +30,19 @@ public class VideoBatch : Entity
 
     public void UpdateStatus()
     {
-        if (_videos.All(v => v.Status == VideoStatus.Pending))
+        if (_videos.All(v => v.Status == VideoStatus.Done))
         {
-            Status = BatchStatus.Pending;
+            Status = BatchStatus.Completed;
+            RegisterUpdate();
             return;
         }
 
         if (_videos.Any(v => v.Status == VideoStatus.Processing || v.Status == VideoStatus.Pending))
         {
-            Status = BatchStatus.Processing;
+            var anyProcessing = _videos.Any(v => v.Status == VideoStatus.Processing || v.Status == VideoStatus.Done);
+
+            Status = anyProcessing ? BatchStatus.Processing : BatchStatus.Pending;
+
             RegisterUpdate();
             return;
         }
@@ -47,15 +51,9 @@ public class VideoBatch : Entity
         {
             Status = BatchStatus.Error;
         }
-
         else if (_videos.Any(v => v.Status == VideoStatus.Error))
         {
-            Status = BatchStatus.CompletedWithErrors;
-        }
-        
-        else
-        {
-            Status = BatchStatus.Completed;
+            Status = BatchStatus.CompletedWithErrors; 
         }
 
         RegisterUpdate();
