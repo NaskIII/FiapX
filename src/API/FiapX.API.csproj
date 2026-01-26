@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\FiapX.Application.csproj" />
     <ProjectReference Include="..\Infrastructure\FiapX.Infrastructure.csproj" />
   </ItemGroup>
 
