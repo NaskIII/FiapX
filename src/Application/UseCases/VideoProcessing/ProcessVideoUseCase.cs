@@ -42,7 +42,7 @@ namespace FiapX.Application.UseCases.VideoProcessing
                 }
                 catch (ConcurrencyException ex)
                 {
-                    _logger.LogWarning(ex, "Concurrency conflict detected for Video {input.VideoId}. Attempt {attempt}/{MaxRetries}.", input.VideoId, attempt, MaxRetries);
+                    _logger.LogWarning(ex, "Concurrency conflict detected for Video {inputVideoId}. Attempt {attempt}/{MaxRetries}.", input.VideoId, attempt, MaxRetries);
 
                     if (attempt == MaxRetries)
                     {

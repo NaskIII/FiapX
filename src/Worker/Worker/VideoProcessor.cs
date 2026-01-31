@@ -30,7 +30,7 @@ namespace FiapX.Worker.Worker
                 Connection = "FiapXServiceBusConnection"
         )] string myQueueItem)
         {
-            _logger.LogInformation("Processing message: {myQueueItem}", myQueueItem);
+            _logger.LogInformation("Processing message: {MyQueueItem}", myQueueItem);
 
             try
             {
@@ -39,7 +39,7 @@ namespace FiapX.Worker.Worker
                 if (payload != null)
                 {
                     await _useCase.ExecuteAsync(payload);
-                    _logger.LogInformation("Video {payload.VideoId} processed successfully.", payload.VideoId);
+                    _logger.LogInformation("Video {PayloadVideoId} processed successfully.", payload.VideoId);
                 }
             }
             catch (Exception ex)
