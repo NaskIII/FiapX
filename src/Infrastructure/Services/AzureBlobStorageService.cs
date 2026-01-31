@@ -8,10 +8,9 @@ public class AzureBlobStorageService : IFileStorageService
 {
     private readonly BlobServiceClient _blobServiceClient;
 
-    public AzureBlobStorageService(FiapXSettings settings)
+    public AzureBlobStorageService(BlobServiceClient blobServiceClient)
     {
-        var options = new BlobClientOptions(BlobClientOptions.ServiceVersion.V2025_11_05);
-        _blobServiceClient = new BlobServiceClient(settings.Storage.ConnectionString, options);
+        _blobServiceClient = blobServiceClient;
     }
 
     public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string containerName)
@@ -40,7 +39,6 @@ public class AzureBlobStorageService : IFileStorageService
             throw new FileNotFoundException($"Arquivo {fileName} não encontrado no container {containerName}");
         }
 
-        var response = await blobClient.OpenReadAsync();
-        return response;
+        return await blobClient.OpenReadAsync();
     }
 }

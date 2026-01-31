@@ -1,4 +1,5 @@
-﻿using FiapX.Infrastructure.Services;
+﻿using Azure.Storage.Blobs;
+using FiapX.Infrastructure.Services;
 using FiapX.IntegrationTests.Setup;
 using FluentAssertions;
 using System.Text;
@@ -12,7 +13,8 @@ public class BlobStorageServiceTests : IClassFixture<DatabaseFixture>
 
     public BlobStorageServiceTests(DatabaseFixture fixture)
     {
-        _service = new AzureBlobStorageService(fixture.Settings);
+        var serviceClient = new BlobServiceClient(fixture.Settings.Storage.ConnectionString);
+        _service = new AzureBlobStorageService(serviceClient);
         _containerName = fixture.Settings.Storage.ContainerRaw;
     }
 

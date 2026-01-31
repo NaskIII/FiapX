@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
 using FiapX.Core.Interfaces;
 using FiapX.Core.Interfaces.Repositories;
 using FiapX.Core.Interfaces.UnityOfWork;
@@ -58,7 +59,12 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        services.AddSingleton<IFileStorageService, AzureBlobStorageService>();
+        services.AddSingleton(x =>
+        {
+            var settings = x.GetRequiredService<FiapXSettings>();
+            return new BlobServiceClient(settings.Storage.ConnectionString);
+        });
+        services.AddScoped<IFileStorageService, AzureBlobStorageService>();
 
         services.AddSingleton(x => new ServiceBusClient(settings.ServiceBus.Connection));
         services.AddSingleton<IMessagePublisher, AzureServiceBusService>();
