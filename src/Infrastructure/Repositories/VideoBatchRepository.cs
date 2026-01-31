@@ -24,7 +24,7 @@ namespace FiapX.Infrastructure.Repositories
                 .Where(v => v.BatchId == batchId)
                 .ToListAsync();
 
-            if (videos.Any())
+            if (videos.Count != 0)
             {
                 var field = typeof(VideoBatch).GetField("_videos", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 field?.SetValue(batch, videos);

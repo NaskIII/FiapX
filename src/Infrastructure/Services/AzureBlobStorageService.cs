@@ -7,13 +7,11 @@ namespace FiapX.Infrastructure.Services;
 public class AzureBlobStorageService : IFileStorageService
 {
     private readonly BlobServiceClient _blobServiceClient;
-    private readonly FiapXSettings _settings;
 
     public AzureBlobStorageService(FiapXSettings settings)
     {
-        _settings = settings;
         var options = new BlobClientOptions(BlobClientOptions.ServiceVersion.V2025_11_05);
-        _blobServiceClient = new BlobServiceClient(_settings.Storage.ConnectionString, options);
+        _blobServiceClient = new BlobServiceClient(settings.Storage.ConnectionString, options);
     }
 
     public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string containerName)

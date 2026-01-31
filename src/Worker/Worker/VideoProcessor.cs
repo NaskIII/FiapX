@@ -11,13 +11,16 @@ namespace FiapX.Worker.Worker
     {
         private readonly ILogger<VideoProcessor> _logger;
         private readonly IProcessVideoUseCase _useCase;
-        private readonly FiapXSettings _settings;
+        private readonly JsonSerializerOptions _jsonOptions;
 
-        public VideoProcessor(ILogger<VideoProcessor> logger, IProcessVideoUseCase useCase, FiapXSettings settings)
+        public VideoProcessor(ILogger<VideoProcessor> logger, IProcessVideoUseCase useCase)
         {
             _logger = logger;
             _useCase = useCase;
-            _settings = settings;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
         }
 
         [Function("ProcessVideoQueue")]
@@ -27,19 +30,16 @@ namespace FiapX.Worker.Worker
                 Connection = "FiapXServiceBusConnection"
         )] string myQueueItem)
         {
-            _logger.LogInformation($"Processing message: {myQueueItem}");
+            _logger.LogInformation("Processing message: {myQueueItem}", myQueueItem);
 
             try
             {
-                var payload = JsonSerializer.Deserialize<ProcessVideoInput>(myQueueItem, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+                var payload = JsonSerializer.Deserialize<ProcessVideoInput>(myQueueItem, _jsonOptions);
 
                 if (payload != null)
                 {
                     await _useCase.ExecuteAsync(payload);
-                    _logger.LogInformation($"Video {payload.VideoId} processed successfully.");
+                    _logger.LogInformation("Video {payload.VideoId} processed successfully.", payload.VideoId);
                 }
             }
             catch (Exception ex)

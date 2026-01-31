@@ -40,9 +40,9 @@ namespace FiapX.Application.UseCases.VideoProcessing
                     await ProcessInternalAsync(input);
                     return;
                 }
-                catch (ConcurrencyException)
+                catch (ConcurrencyException ex)
                 {
-                    _logger.LogWarning($"Concurrency conflict detected for Video {input.VideoId}. Attempt {attempt}/{MaxRetries}.");
+                    _logger.LogWarning(ex, "Concurrency conflict detected for Video {input.VideoId}. Attempt {attempt}/{MaxRetries}.", input.VideoId, attempt, MaxRetries);
 
                     if (attempt == MaxRetries)
                     {

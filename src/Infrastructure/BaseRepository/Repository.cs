@@ -160,5 +160,6 @@ public class Repository<T> : IRepository<T> where T : class
     public void Dispose()
     {
         _context.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
