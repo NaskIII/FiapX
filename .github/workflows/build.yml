@@ -53,5 +53,5 @@ jobs:
         run: |
             ./.sonar/scanner/dotnet-sonarscanner begin /k:"NaskIII_FiapX" /o:"naskiii" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" /d:sonar.exclusions="**/Migrations/**"
             dotnet build
-            dotnet test src/FiapX.UnitTests/FiapX.UnitTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+            dotnet test src/FiapX.UnitTests/FiapX.UnitTests.csproj --no-build --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
             ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
