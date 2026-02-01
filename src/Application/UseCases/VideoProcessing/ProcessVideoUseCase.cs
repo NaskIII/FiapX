@@ -4,6 +4,7 @@ using FiapX.Core.Enums;
 using FiapX.Core.Interfaces;
 using FiapX.Core.Interfaces.Repositories;
 using FiapX.Core.Interfaces.UnityOfWork;
+using FiapX.Core.Interfaces.VideoFramerExtractor;
 using Microsoft.Extensions.Logging;
 using System.IO.Compression;
 
@@ -14,17 +15,20 @@ namespace FiapX.Application.UseCases.VideoProcessing
         private readonly IVideoBatchRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileStorageService _storageService;
+        private readonly IVideoFrameExtractorService _frameExtractor;
         private readonly ILogger<ProcessVideoUseCase> _logger;
 
         public ProcessVideoUseCase(
             IVideoBatchRepository repository,
             IUnitOfWork unitOfWork,
             IFileStorageService storageService,
+            IVideoFrameExtractorService frameExtractor,
             ILogger<ProcessVideoUseCase> logger)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _storageService = storageService;
+            _frameExtractor = frameExtractor;
             _logger = logger;
         }
 
@@ -62,36 +66,77 @@ namespace FiapX.Application.UseCases.VideoProcessing
             if (batch == null) return;
 
             var video = batch.Videos.FirstOrDefault(v => v.Id == input.VideoId);
-
             if (video == null || video.Status == VideoStatus.Done) return;
+
+            var tempPath = Path.GetTempPath();
+            var uniqueId = Guid.NewGuid();
+
+            var originalExtension = Path.GetExtension(video.FileName);
+            var inputVideoPath = Path.Combine(tempPath, $"{uniqueId}_input{originalExtension}");
+            var outputFramesDir = Path.Combine(tempPath, $"{uniqueId}_frames");
+            var zipFilePath = Path.Combine(tempPath, $"{uniqueId}_processed.zip");
 
             try
             {
-                using var memoryStream = new MemoryStream();
-                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                var blobName = $"{batch.Id}/{video.FileName}";
+                using (var videoStream = await _storageService.DownloadFileAsync(blobName, "videos-raw"))
+                using (var fileStream = File.Create(inputVideoPath))
                 {
-                    var demoFile = archive.CreateEntry($"frame_{DateTime.UtcNow.Ticks}.txt");
-                    using var entryStream = demoFile.Open();
-                    using var writer = new StreamWriter(entryStream);
-                    await writer.WriteAsync("Fake Image Content from Video " + video.FileName);
+                    await videoStream.CopyToAsync(fileStream);
                 }
 
-                memoryStream.Position = 0;
+                await _frameExtractor.ExtractFramesAsync(inputVideoPath, outputFramesDir);
 
-                var zipFileName = $"{batch.Id}/{video.Id}_processed.zip";
-                var zipUrl = await _storageService.UploadFileAsync(memoryStream, zipFileName, "videos-zip");
+                ZipFile.CreateFromDirectory(outputFramesDir, zipFilePath);
+
+                string zipUrl;
+                using (var zipStream = File.OpenRead(zipFilePath))
+                {
+                    var zipFileName = $"{batch.Id}/{video.Id}_processed.zip";
+                    zipUrl = await _storageService.UploadFileAsync(zipStream, zipFileName, "videos-zip");
+                }
 
                 video.MarkAsDone(zipUrl);
                 batch.UpdateStatus();
-
                 _repository.Update(batch);
             }
             catch (Exception ex)
             {
-                video.MarkAsError(ex.Message);
+                if (ex is FormatException || ex is InvalidDataException)
+                {
+                    _logger.LogError(ex, "Erro de negócio (arquivo inválido) no vídeo {VideoId}.", input.VideoId);
+                    video.MarkAsError(ex.Message);
+                    batch.UpdateStatus();
+                    _repository.Update(batch);
+                    await _unitOfWork.CommitAsync();
+                    return;
+                }
+                else
+                {
+                    _logger.LogError(ex, "Erro de infraestrutura no vídeo {VideoId}.", input.VideoId);
+                    throw;
+                }
+            }
+            finally
+            {
+                CleanupTempFiles(inputVideoPath, outputFramesDir, zipFilePath);
             }
 
             await _unitOfWork.CommitAsync();
+        }
+
+        private void CleanupTempFiles(string videoPath, string framesDir, string zipPath)
+        {
+            try
+            {
+                if (File.Exists(videoPath)) File.Delete(videoPath);
+                if (File.Exists(zipPath)) File.Delete(zipPath);
+                if (Directory.Exists(framesDir)) Directory.Delete(framesDir, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Não foi possível limpar arquivos temporários: {Message}", ex.Message);
+            }
         }
     }
 }
