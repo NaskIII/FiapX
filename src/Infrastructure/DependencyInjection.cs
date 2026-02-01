@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using FiapX.Core.Interfaces;
 using FiapX.Core.Interfaces.Repositories;
 using FiapX.Core.Interfaces.UnityOfWork;
+using FiapX.Core.Interfaces.VideoFramerExtractor;
 using FiapX.Infrastructure.BaseRepository;
 using FiapX.Infrastructure.Data;
 using FiapX.Infrastructure.Repositories;
@@ -70,6 +71,8 @@ public static class DependencyInjection
 
         services.AddSingleton(x => new ServiceBusClient(settings.ServiceBus.Connection));
         services.AddSingleton<IMessagePublisher, AzureServiceBusService>();
+
+        services.AddScoped<IVideoFrameExtractorService, FFMpegFrameExtractorService>();
 
         return services;
     }
