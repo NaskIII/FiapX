@@ -20,7 +20,7 @@ services:
       start_period: 40s
 
   azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
+    image: mcr.microsoft.com/azure-storage/azurite:latest
     container_name: fiapx-storage
     ports:
       - "10000:10000"
