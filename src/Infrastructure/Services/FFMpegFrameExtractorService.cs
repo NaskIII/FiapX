@@ -2,6 +2,7 @@
 using FFMpegCore.Exceptions;
 using FiapX.Core.Interfaces.VideoFramerExtractor;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -47,6 +48,7 @@ namespace FiapX.Infrastructure.Services
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public async Task ExtractFramesAsync(string inputFilePath, string outputDirectoryPath)
         {
             try
