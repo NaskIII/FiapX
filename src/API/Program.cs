@@ -1,9 +1,10 @@
+using FiapX.Application;
+using FiapX.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using FiapX.Infrastructure;
-using FiapX.Application;
+using System.Diagnostics.CodeAnalysis;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -17,3 +18,6 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
 
 await builder.Build().RunAsync();
+
+[ExcludeFromCodeCoverage]
+public partial class Program { }

@@ -1,14 +1,14 @@
 ﻿using FiapX.Application.Interfaces;
-using FiapX.Application.UseCases.Batch;
 using FiapX.Application.UseCases.DTOs;
-using FiapX.Application.UseCases.VideoUpload;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FiapX.API.Endpoints
 {
+    [ExcludeFromCodeCoverage]
     public class VideoBatchFunctions
     {
         private readonly ILogger<VideoBatchFunctions> _logger;

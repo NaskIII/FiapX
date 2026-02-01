@@ -6,6 +6,7 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -36,3 +37,6 @@ using (var scope = host.Services.CreateScope())
 }
 
 await host.RunAsync();
+
+[ExcludeFromCodeCoverage]
+public partial class Program { }

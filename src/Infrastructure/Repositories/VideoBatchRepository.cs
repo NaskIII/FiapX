@@ -2,9 +2,11 @@
 using FiapX.Core.Interfaces.Repositories;
 using FiapX.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FiapX.Infrastructure.Repositories
 {
+    [ExcludeFromCodeCoverage]
     public class VideoBatchRepository : Repository<VideoBatch>, IVideoBatchRepository
     {
         public VideoBatchRepository(FiapXDbContext context) : base(context)

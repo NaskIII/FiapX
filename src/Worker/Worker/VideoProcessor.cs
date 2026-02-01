@@ -1,12 +1,14 @@
 ﻿using FiapX.Application.Interfaces;
 using FiapX.Application.UseCases.DTOs;
-using FiapX.Infrastructure.Settings;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace FiapX.Worker.Worker
 {
+
+    [ExcludeFromCodeCoverage]
     public class VideoProcessor
     {
         private readonly ILogger<VideoProcessor> _logger;
