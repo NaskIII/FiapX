@@ -30,10 +30,5 @@ namespace FiapX.UnitTests.Infrastructure
                 if (Directory.Exists(outputDir)) Directory.Delete(outputDir, true);
             }
         }
-
-        [Fact]
-        public async Task ExtractFramesAsync_Should_Throw_InvalidDataException_When_FFMpeg_Fails()
-        {
-        }
     }
 }

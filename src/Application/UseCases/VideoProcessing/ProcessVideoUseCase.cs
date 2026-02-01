@@ -71,7 +71,8 @@ namespace FiapX.Application.UseCases.VideoProcessing
             var tempPath = Path.GetTempPath();
             var uniqueId = Guid.NewGuid();
 
-            var inputVideoPath = Path.Combine(tempPath, $"{uniqueId}_input.mp4");
+            var originalExtension = Path.GetExtension(video.FileName);
+            var inputVideoPath = Path.Combine(tempPath, $"{uniqueId}_input{originalExtension}");
             var outputFramesDir = Path.Combine(tempPath, $"{uniqueId}_frames");
             var zipFilePath = Path.Combine(tempPath, $"{uniqueId}_processed.zip");
 
@@ -105,6 +106,8 @@ namespace FiapX.Application.UseCases.VideoProcessing
                 {
                     _logger.LogError(ex, "Erro de negócio (arquivo inválido) no vídeo {VideoId}.", input.VideoId);
                     video.MarkAsError(ex.Message);
+                    batch.UpdateStatus();
+                    _repository.Update(batch);
                     await _unitOfWork.CommitAsync();
                     return;
                 }
@@ -132,7 +135,7 @@ namespace FiapX.Application.UseCases.VideoProcessing
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Não foi possível limpar arquivos temporários: {Message}", ex.Message);
+                _logger.LogWarning(ex, "Não foi possível limpar arquivos temporários: {Message}", ex.Message);
             }
         }
     }

@@ -32,7 +32,7 @@ namespace FiapX.Infrastructure.Services
             }
         }
 
-        private void EnsureLinuxExecutionPermission(string filePath)
+        private static void EnsureLinuxExecutionPermission(string filePath)
         {
             try
             {
