@@ -20,7 +20,7 @@ public class GetBatchStatusUseCaseTests
     [Fact]
     public async Task ExecuteAsync_Should_Return_Mapped_Dto_When_Batch_Exists()
     {
-        var batch = new VideoBatch("user@teste.com");
+        var batch = new VideoBatch(new Guid());
         batch.AddVideo("teste.mp4", "raw/url");
         var video = batch.Videos.First();
         video.MarkAsDone("zip/url.zip");

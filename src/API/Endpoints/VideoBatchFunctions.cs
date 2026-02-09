@@ -38,13 +38,9 @@ namespace FiapX.API.Endpoints
 
             var form = await req.ReadFormAsync();
             var files = form.Files;
-            var userOwner = form["userOwner"].ToString();
 
             if (files.Count == 0)
                 return new BadRequestObjectResult("Nenhum arquivo enviado.");
-
-            if (string.IsNullOrEmpty(userOwner))
-                return new BadRequestObjectResult("UserOwner é obrigatório.");
 
             var fileInputs = new List<FileInput>();
             foreach (var file in files)
@@ -53,7 +49,7 @@ namespace FiapX.API.Endpoints
                 fileInputs.Add(new FileInput(file.FileName, stream, file.ContentType));
             }
 
-            var input = new UploadBatchInput(userOwner, fileInputs);
+            var input = new UploadBatchInput(fileInputs);
             var output = await _uploadUseCase.ExecuteAsync(input);
 
             return new OkObjectResult(output);

@@ -13,8 +13,9 @@ public class VideoBatchConfiguration : IEntityTypeConfiguration<VideoBatch>
         builder.HasKey(b => b.Id);
         builder.HasPartitionKey(b => b.BatchId);
 
-        builder.Property(b => b.UserOwner)
+        builder.Property(b => b.UserId)
                .IsRequired();
+        builder.HasIndex(b => b.UserId);
 
         builder.Property(b => b.CreatedAt).ToJsonProperty("createdAt");
         builder.Property(b => b.UpdatedAt).ToJsonProperty("updatedAt");

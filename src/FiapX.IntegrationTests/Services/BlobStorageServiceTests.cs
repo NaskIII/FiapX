@@ -13,7 +13,8 @@ public class BlobStorageServiceTests : IClassFixture<DatabaseFixture>
 
     public BlobStorageServiceTests(DatabaseFixture fixture)
     {
-        var serviceClient = new BlobServiceClient(fixture.Settings.Storage.ConnectionString);
+        var options = new BlobClientOptions(BlobClientOptions.ServiceVersion.V2025_11_05);
+        var serviceClient = new BlobServiceClient(fixture.Settings.Storage.ConnectionString, options);
         _service = new AzureBlobStorageService(serviceClient);
         _containerName = fixture.Settings.Storage.ContainerRaw;
     }

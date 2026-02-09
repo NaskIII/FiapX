@@ -2,6 +2,7 @@
 using Azure.Storage.Blobs;
 using FiapX.Core.Interfaces;
 using FiapX.Core.Interfaces.Repositories;
+using FiapX.Core.Interfaces.Security;
 using FiapX.Core.Interfaces.UnityOfWork;
 using FiapX.Core.Interfaces.VideoFramerExtractor;
 using FiapX.Infrastructure.BaseRepository;
@@ -65,6 +66,13 @@ public static class DependencyInjection
         services.AddSingleton(x =>
         {
             var settings = x.GetRequiredService<FiapXSettings>();
+
+            if (isDevelopment)
+            {
+                var options = new BlobClientOptions(BlobClientOptions.ServiceVersion.V2025_11_05);
+                return new BlobServiceClient(settings.Storage.ConnectionString, options);
+            }
+
             return new BlobServiceClient(settings.Storage.ConnectionString);
         });
         services.AddScoped<IFileStorageService, AzureBlobStorageService>();
@@ -73,6 +81,11 @@ public static class DependencyInjection
         services.AddSingleton<IMessagePublisher, AzureServiceBusService>();
 
         services.AddScoped<IVideoFrameExtractorService, FFMpegFrameExtractorService>();
+
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<ITokenService, JwtTokenService>();
+        services.AddScoped<IUserContext, UserContextService>();
 
         return services;
     }

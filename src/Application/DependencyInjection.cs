@@ -1,4 +1,5 @@
 ﻿using FiapX.Application.Interfaces;
+using FiapX.Application.UseCases.Auth;
 using FiapX.Application.UseCases.Batch;
 using FiapX.Application.UseCases.VideoProcessing;
 using FiapX.Application.UseCases.VideoUpload;
@@ -16,6 +17,8 @@ public static class DependencyInjection
         services.AddScoped<IGetBatchStatusUseCase, GetBatchStatusUseCase>();
         services.AddScoped<IUploadVideoUseCase, UploadVideoUseCase>();
         services.AddScoped<IProcessVideoUseCase, ProcessVideoUseCase>();
+        services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+        services.AddScoped<ILoginUseCase, LoginUseCase>();
 
         return services;
     }

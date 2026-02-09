@@ -1,12 +1,17 @@
 using FiapX.Application;
+using FiapX.Core.Interfaces.Security;
 using FiapX.Infrastructure;
 using FiapX.Infrastructure.Data;
+using FiapX.Infrastructure.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = FunctionsApplication.CreateBuilder(args);
 

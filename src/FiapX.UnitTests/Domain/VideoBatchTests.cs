@@ -9,7 +9,9 @@ public class VideoBatchTests
     [Fact]
     public void AddVideo_Should_Add_Video_To_List_And_Set_Correct_BatchId()
     {
-        var batch = new VideoBatch("user@test.com");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         var fileName = "video1.mp4";
         var filePath = "raw/video1.mp4";
 
@@ -26,7 +28,9 @@ public class VideoBatchTests
     [Fact]
     public void UpdateStatus_Should_Change_To_Completed_When_All_Videos_Are_Done()
     {
-        var batch = new VideoBatch("user@test.com");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         batch.AddVideo("v1.mp4", "path/v1");
         batch.AddVideo("v2.mp4", "path/v2");
 
@@ -44,7 +48,9 @@ public class VideoBatchTests
     [Fact]
     public void UpdateStatus_Should_Change_To_Processing_When_At_Least_One_Video_Is_Processing()
     {
-        var batch = new VideoBatch("user@test.com");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         batch.AddVideo("v1.mp4", "path/v1");
         batch.AddVideo("v2.mp4", "path/v2");
 
@@ -59,7 +65,9 @@ public class VideoBatchTests
     [Fact]
     public void UpdateStatus_Should_Remain_Pending_If_All_Videos_Are_Pending()
     {
-        var batch = new VideoBatch("user@test.com");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         batch.AddVideo("v1.mp4", "path/v1");
         batch.AddVideo("v2.mp4", "path/v2");
 
@@ -71,7 +79,9 @@ public class VideoBatchTests
     [Fact]
     public void UpdateStatus_Should_Change_To_Error_Only_If_All_Videos_Failed()
     {
-        var batch = new VideoBatch("user@test.com");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         batch.AddVideo("v1.mp4", "path/v1");
         batch.AddVideo("v2.mp4", "path/v2");
 
@@ -89,7 +99,9 @@ public class VideoBatchTests
     [Fact]
     public void UpdateStatus_Should_Be_CompletedWithErrors_When_Some_Succeeded_And_Some_Failed()
     {
-        var batch = new VideoBatch("user@test.com");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         batch.AddVideo("v1.mp4", "path/v1");
         batch.AddVideo("v2.mp4", "path/v2");
 
@@ -107,12 +119,11 @@ public class VideoBatchTests
     [Fact]
     public void Constructor_Should_Initialize_With_Pending_Status_And_Dates()
     {
-        var user = "user@test.com";
-
-        var batch = new VideoBatch(user);
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
 
         batch.Id.Should().NotBeEmpty();
-        batch.UserOwner.Should().Be(user);
+        batch.UserId.Should().Be(userId);
         batch.Status.Should().Be(BatchStatus.Pending);
         batch.Videos.Should().BeEmpty();
         batch.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
