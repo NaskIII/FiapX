@@ -2,6 +2,7 @@
 using FiapX.Infrastructure.Services;
 using FiapX.IntegrationTests.Setup;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using System.Text;
 
 namespace FiapX.IntegrationTests.Services;
@@ -11,11 +12,11 @@ public class BlobStorageServiceTests : IClassFixture<DatabaseFixture>
     private readonly AzureBlobStorageService _service;
     private readonly string _containerName;
 
-    public BlobStorageServiceTests(DatabaseFixture fixture)
+    public BlobStorageServiceTests(DatabaseFixture fixture, ILogger<AzureBlobStorageService> logger)
     {
         var options = new BlobClientOptions(BlobClientOptions.ServiceVersion.V2025_11_05);
         var serviceClient = new BlobServiceClient(fixture.Settings.Storage.ConnectionString, options);
-        _service = new AzureBlobStorageService(serviceClient);
+        _service = new AzureBlobStorageService(serviceClient, logger);
         _containerName = fixture.Settings.Storage.ContainerRaw;
     }
 

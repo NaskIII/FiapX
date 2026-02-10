@@ -2,6 +2,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using FiapX.Infrastructure.Services;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace FiapX.UnitTests.Infrastructure;
@@ -18,6 +19,7 @@ public class AzureBlobStorageServiceTests
         _blobServiceClientMock = new Mock<BlobServiceClient>();
         _containerClientMock = new Mock<BlobContainerClient>();
         _blobClientMock = new Mock<BlobClient>();
+        ILogger<AzureBlobStorageService> _loggerMock = new Mock<ILogger<AzureBlobStorageService>>().Object;
 
         _blobServiceClientMock
             .Setup(x => x.GetBlobContainerClient(It.IsAny<string>()))
@@ -27,7 +29,7 @@ public class AzureBlobStorageServiceTests
             .Setup(x => x.GetBlobClient(It.IsAny<string>()))
             .Returns(_blobClientMock.Object);
 
-        _service = new AzureBlobStorageService(_blobServiceClientMock.Object);
+        _service = new AzureBlobStorageService(_blobServiceClientMock.Object, _loggerMock);
     }
 
     [Fact]

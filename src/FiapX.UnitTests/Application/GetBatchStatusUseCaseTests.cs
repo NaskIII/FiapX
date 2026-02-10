@@ -1,5 +1,6 @@
 ﻿using FiapX.Application.UseCases.Batch;
 using FiapX.Core.Entities;
+using FiapX.Core.Interfaces;
 using FiapX.Core.Interfaces.Repositories;
 using FluentAssertions;
 using Moq;
@@ -9,12 +10,18 @@ namespace FiapX.UnitTests.Application;
 public class GetBatchStatusUseCaseTests
 {
     private readonly Mock<IVideoBatchRepository> _repoMock;
+    private readonly Mock<IFileStorageService> _storageMock;
     private readonly GetBatchStatusUseCase _useCase;
 
     public GetBatchStatusUseCaseTests()
     {
         _repoMock = new Mock<IVideoBatchRepository>();
-        _useCase = new GetBatchStatusUseCase(_repoMock.Object);
+        _storageMock = new Mock<IFileStorageService>();
+
+        _storageMock.Setup(s => s.GenerateSasToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
+                    .Returns("zip/url.zip");
+
+        _useCase = new GetBatchStatusUseCase(_repoMock.Object, _storageMock.Object);
     }
 
     [Fact]
