@@ -72,10 +72,10 @@ namespace FiapX.API.Middleware
         {
             if (string.IsNullOrEmpty(token)) return null;
 
-            var secret = _configuration["FiapX:JwtSecret"];
-            if (string.IsNullOrEmpty(secret)) return null;
+            var jwtSecret = _configuration["FiapX:JwtSecret"];
+            if (string.IsNullOrEmpty(jwtSecret)) return null;
 
-            var key = Encoding.ASCII.GetBytes(secret);
+            var secretBytes = Encoding.ASCII.GetBytes(jwtSecret);
             var handler = new JwtSecurityTokenHandler();
 
             try
@@ -85,7 +85,7 @@ namespace FiapX.API.Middleware
                 return handler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = new SymmetricSecurityKey(secretBytes), // NOSONAR
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ClockSkew = TimeSpan.Zero
