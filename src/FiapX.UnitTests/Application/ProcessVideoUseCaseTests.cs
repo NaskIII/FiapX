@@ -45,7 +45,9 @@ public class ProcessVideoUseCaseTests
     {
         var batchId = Guid.NewGuid();
         var videoId = Guid.NewGuid();
-        var batch = new VideoBatch("user1");
+
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
 
         typeof(Entity).GetProperty("Id")?.SetValue(batch, batchId);
 
@@ -90,7 +92,9 @@ public class ProcessVideoUseCaseTests
         var videoId = Guid.NewGuid();
         var input = new ProcessVideoInput(batchId, videoId);
 
-        var batch = new VideoBatch("user1");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         typeof(Entity).GetProperty("Id")?.SetValue(batch, batchId);
         batch.AddVideo("test.mp4", "path/test.mp4");
         var video = batch.Videos.First();
@@ -118,12 +122,14 @@ public class ProcessVideoUseCaseTests
 
         VideoBatch CreateFreshBatch()
         {
-            var b = new VideoBatch("user1");
-            typeof(Entity).GetProperty("Id")?.SetValue(b, batchId);
-            b.AddVideo("test.mp4", "path");
-            var v = b.Videos.First();
+            Guid userId = Guid.NewGuid();
+            var batch = new VideoBatch(userId);
+
+            typeof(Entity).GetProperty("Id")?.SetValue(batch, batchId);
+            batch.AddVideo("test.mp4", "path");
+            var v = batch.Videos.First();
             typeof(Entity).GetProperty("Id")?.SetValue(v, videoId);
-            return b;
+            return batch;
         }
 
         _repoMock.Setup(r => r.GetBatchWithVideosAsync(batchId))
@@ -158,7 +164,10 @@ public class ProcessVideoUseCaseTests
     public async Task ExecuteAsync_Should_Skip_If_Video_Already_Done()
     {
         var batchId = Guid.NewGuid();
-        var batch = new VideoBatch("user1");
+
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         batch.AddVideo("test.mp4", "path");
         var video = batch.Videos.First();
         video.MarkAsDone("http://old.zip");

@@ -5,6 +5,7 @@
         public ServiceBusSettings ServiceBus { get; set; } = new();
         public CosmosSettings Cosmos { get; set; } = new();
         public StorageSettings Storage { get; set; } = new();
+        public string JwtSecret { get; set; } = string.Empty;
     }
 
     public class ServiceBusSettings

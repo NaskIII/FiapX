@@ -6,8 +6,7 @@ namespace FiapX.Core.Entities;
 public class VideoBatch : Entity
 {
     public Guid BatchId { get; private set; }
-
-    public string UserOwner { get; private set; } = string.Empty;
+    public Guid UserId { get; private set; }
     public BatchStatus Status { get; private set; }
 
     private readonly List<Video> _videos = new();
@@ -15,10 +14,10 @@ public class VideoBatch : Entity
 
     protected VideoBatch() { }
 
-    public VideoBatch(string userOwner) : base()
+    public VideoBatch(Guid userId) : base()
     {
         BatchId = Id;
-        UserOwner = userOwner;
+        UserId = userId;
         Status = BatchStatus.Pending;
     }
 

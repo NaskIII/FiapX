@@ -7,7 +7,6 @@ public record FileInput(
 );
 
 public record UploadBatchInput(
-    string UserOwner,
     List<FileInput> Files
 );
 

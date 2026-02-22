@@ -20,7 +20,8 @@ public class VideoBatchRepositoryTests : IClassFixture<DatabaseFixture>
     [Fact]
     public async Task AddAsync_Should_Persist_Batch_In_CosmosDB()
     {
-        var batch = new VideoBatch("user_integration@test.com");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
 
         await _repository.AddAsync(batch);
         await _fixture.Context.SaveChangesAsync();
@@ -30,13 +31,15 @@ public class VideoBatchRepositoryTests : IClassFixture<DatabaseFixture>
             .FirstOrDefaultAsync(b => b.Id == batch.Id);
 
         savedBatch.Should().NotBeNull();
-        savedBatch!.UserOwner.Should().Be("user_integration@test.com");
+        savedBatch!.UserId.Should().Be(userId);
     }
 
     [Fact]
     public async Task GetBatchWithVideosAsync_Should_Return_Batch_And_Children_Videos()
     {
-        var batch = new VideoBatch("user_complex@test.com");
+        Guid userId = Guid.NewGuid();
+        var batch = new VideoBatch(userId);
+
         batch.AddVideo("filme.mp4", "raw/filme.mp4");
         batch.AddVideo("clip.mp4", "raw/clip.mp4");
 

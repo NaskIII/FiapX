@@ -3,6 +3,7 @@ using FiapX.Application.UseCases.VideoUpload;
 using FiapX.Core.Entities;
 using FiapX.Core.Interfaces;
 using FiapX.Core.Interfaces.Repositories;
+using FiapX.Core.Interfaces.Security;
 using FiapX.Core.Interfaces.UnityOfWork;
 using FluentAssertions;
 using Moq;
@@ -15,6 +16,7 @@ public class UploadVideoUseCaseTests
     private readonly Mock<IUnitOfWork> _uowMock;
     private readonly Mock<IFileStorageService> _storageMock;
     private readonly Mock<IMessagePublisher> _publisherMock;
+    private readonly Mock<IUserContext> _userContextMock;
     private readonly UploadVideoUseCase _useCase;
 
     public UploadVideoUseCaseTests()
@@ -23,12 +25,17 @@ public class UploadVideoUseCaseTests
         _uowMock = new Mock<IUnitOfWork>();
         _storageMock = new Mock<IFileStorageService>();
         _publisherMock = new Mock<IMessagePublisher>();
+        _userContextMock = new Mock<IUserContext>();
+
+        _userContextMock.Setup(u => u.UserId).Returns(Guid.NewGuid());
+        _userContextMock.Setup(u => u.IsAuthenticated).Returns(true);
 
         _useCase = new UploadVideoUseCase(
             _repoMock.Object,
             _uowMock.Object,
             _storageMock.Object,
-            _publisherMock.Object
+            _publisherMock.Object,
+            _userContextMock.Object
         );
     }
 
@@ -41,7 +48,7 @@ public class UploadVideoUseCaseTests
             new("video2.mov", new MemoryStream(), "video/quicktime")
         };
 
-        var input = new UploadBatchInput("user@teste.com", files);
+        var input = new UploadBatchInput(files);
 
         _storageMock.Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.Is<string>(f => f.Contains("video1")), "videos-raw"))
                     .ReturnsAsync("http://url/video1.mp4");
@@ -57,8 +64,8 @@ public class UploadVideoUseCaseTests
         _storageMock.Verify(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), "videos-raw"), Times.Exactly(2));
 
         _repoMock.Verify(r => r.AddAsync(It.Is<VideoBatch>(b =>
-            b.UserOwner == "user@teste.com" &&
-            b.Videos.Count == 2
+            b.Videos.Count == 2 &&
+            b.UserId != Guid.Empty
         )), Times.Once);
 
         _uowMock.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);

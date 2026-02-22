@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\API\FiapX.API.csproj" />
     <ProjectReference Include="..\Application\FiapX.Application.csproj" />
     <ProjectReference Include="..\Core\FiapX.Core.csproj" />
     <ProjectReference Include="..\Infrastructure\FiapX.Infrastructure.csproj" />
