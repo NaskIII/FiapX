@@ -1,6 +1,10 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿using Azure.Communication.Email;
+using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
+using FiapX.Application.Interfaces;
+using FiapX.Application.UseCases.Batch;
 using FiapX.Core.Interfaces;
+using FiapX.Core.Interfaces.Notifications;
 using FiapX.Core.Interfaces.Repositories;
 using FiapX.Core.Interfaces.Security;
 using FiapX.Core.Interfaces.UnityOfWork;
@@ -9,9 +13,11 @@ using FiapX.Infrastructure.BaseRepository;
 using FiapX.Infrastructure.Data;
 using FiapX.Infrastructure.Repositories;
 using FiapX.Infrastructure.Services;
+using FiapX.Infrastructure.Services.Notifications;
 using FiapX.Infrastructure.Settings;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -86,6 +92,17 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IUserContext, UserContextService>();
+
+        services.AddSingleton(x =>
+        {
+            var settings = x.GetRequiredService<FiapXSettings>();
+
+            return new EmailClient(settings.AzureCommunicationServices.ConnectionString);
+        });
+
+        services.AddScoped<IEmailNotificationService, AzureEmailNotificationService>();
+        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+        services.AddScoped<INotifyBatchProcessingResultUseCase, NotifyBatchProcessingResultUseCase>();
 
         return services;
     }

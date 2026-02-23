@@ -65,3 +65,4 @@ Report/
 reports/
 
 *.html
+!src/Infrastructure/Resources/Emails/*

@@ -1,4 +1,5 @@
 ﻿using FiapX.Application;
+using FiapX.Application.Interfaces;
 using FiapX.Application.UseCases.DTOs;
 using FiapX.Application.UseCases.VideoProcessing;
 using FiapX.Core.Entities;
@@ -21,6 +22,7 @@ public class ProcessVideoUseCaseTests
     private readonly Mock<IFileStorageService> _storageMock;
     private readonly Mock<IVideoFrameExtractorService> _frameExtractorMock;
     private readonly Mock<ILogger<ProcessVideoUseCase>> _loggerMock;
+    private readonly Mock<INotifyBatchProcessingResultUseCase> _notificationUseCaseMock;
     private readonly ProcessVideoUseCase _useCase;
 
     public ProcessVideoUseCaseTests()
@@ -30,12 +32,14 @@ public class ProcessVideoUseCaseTests
         _storageMock = new Mock<IFileStorageService>();
         _frameExtractorMock = new Mock<IVideoFrameExtractorService>();
         _loggerMock = new Mock<ILogger<ProcessVideoUseCase>>();
+        _notificationUseCaseMock = new Mock<INotifyBatchProcessingResultUseCase>();
 
         _useCase = new ProcessVideoUseCase(
             _repoMock.Object,
             _uowMock.Object,
             _storageMock.Object,
             _frameExtractorMock.Object,
+            _notificationUseCaseMock.Object,
             _loggerMock.Object
         );
     }
