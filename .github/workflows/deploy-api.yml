@@ -1,0 +1,79 @@
+name: Deploy All Functions
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - '.github/workflows/**'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  API_PACKAGE_PATH: 'src/API/FiapX.API'
+  WORKER_PACKAGE_PATH: 'src/Worker/FiapX.Worker'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test src/FiapX.UnitTests/FiapX.UnitTests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Publish API
+        run: dotnet publish ${{ env.API_PACKAGE_PATH }} -c Release -o ./publish-api
+
+      - name: Publish Worker
+        run: dotnet publish ${{ env.WORKER_PACKAGE_PATH }} -c Release -o ./publish-worker
+
+      - name: Upload API Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-app
+          path: ./publish-api
+
+      - name: Upload Worker Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: worker-app
+          path: ./publish-worker
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app_name: 'func-fiapx-api'
+            artifact: 'api-app'
+            secret_name: 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_API'
+          - app_name: 'func-fiapx-worker'
+            artifact: 'worker-app'
+            secret_name: 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_WORKER'
+    
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ./app
+
+      - name: Deploy to Azure
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ matrix.app_name }}
+          package: ./app
+          publish-profile: ${{ secrets[matrix.secret_name] }}

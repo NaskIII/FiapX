@@ -37,9 +37,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{EA691CBE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{46BF04A8-3D09-434C-93FC-0A9FC3698924}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "worflows", "worflows", "{5D758676-8211-4E7F-ABFB-876E1C6A102A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{5D758676-8211-4E7F-ABFB-876E1C6A102A}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\deploy-api.yml = .github\workflows\deploy-api.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".git", ".git", "{81E0A5F8-54F4-4296-8798-83FD1247DC1E}"
