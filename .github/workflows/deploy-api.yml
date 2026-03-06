@@ -10,8 +10,8 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
-  API_PACKAGE_PATH: 'src/API/FiapX.API'
-  WORKER_PACKAGE_PATH: 'src/Worker/FiapX.Worker'
+  API_PACKAGE_PATH: 'src/API/FiapX.API.csproj'
+  WORKER_PACKAGE_PATH: 'src/Worker/FiapX.Worker.csproj'
 
 jobs:
   build-and-test:
