@@ -1,5 +1,6 @@
 ﻿using FiapX.Application.Interfaces;
 using FiapX.Application.UseCases.DTOs;
+using FiapX.Core.Entities;
 using FiapX.Core.Enums;
 using FiapX.Core.Interfaces;
 using FiapX.Core.Interfaces.Repositories;
@@ -16,6 +17,7 @@ namespace FiapX.Application.UseCases.VideoProcessing
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileStorageService _storageService;
         private readonly IVideoFrameExtractorService _frameExtractor;
+        private readonly INotifyBatchProcessingResultUseCase _notificationUseCase;
         private readonly ILogger<ProcessVideoUseCase> _logger;
 
         public ProcessVideoUseCase(
@@ -23,12 +25,14 @@ namespace FiapX.Application.UseCases.VideoProcessing
             IUnitOfWork unitOfWork,
             IFileStorageService storageService,
             IVideoFrameExtractorService frameExtractor,
+            INotifyBatchProcessingResultUseCase notificationUseCase,
             ILogger<ProcessVideoUseCase> logger)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _storageService = storageService;
             _frameExtractor = frameExtractor;
+            _notificationUseCase = notificationUseCase;
             _logger = logger;
         }
 
@@ -109,6 +113,8 @@ namespace FiapX.Application.UseCases.VideoProcessing
                     batch.UpdateStatus();
                     _repository.Update(batch);
                     await _unitOfWork.CommitAsync();
+
+                    await NotifyIfBatchFinishedAsync(batch, ex.Message);
                     return;
                 }
                 else
@@ -123,6 +129,19 @@ namespace FiapX.Application.UseCases.VideoProcessing
             }
 
             await _unitOfWork.CommitAsync();
+            await NotifyIfBatchFinishedAsync(batch, string.Empty);
+        }
+
+        private async Task NotifyIfBatchFinishedAsync(VideoBatch batch, string errorMessage)
+        {
+            if (batch.Status == BatchStatus.Completed)
+            {
+                await _notificationUseCase.ExecuteSuccessAsync(batch.UserId, batch.Id);
+            }
+            else if (batch.Status == BatchStatus.Error)
+            {
+                await _notificationUseCase.ExecuteErrorAsync(batch.UserId, batch.Id, errorMessage);
+            }
         }
 
         private void CleanupTempFiles(string videoPath, string framesDir, string zipPath)

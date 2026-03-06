@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            background-color: #dc2626;
+            padding: 24px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+            .header h2 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 600;
+            }
+
+        .content {
+            padding: 32px;
+            color: #334155;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+            .content p {
+                margin-top: 0;
+                margin-bottom: 16px;
+            }
+
+        .batch-id {
+            background-color: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #475569;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .error-box {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+
+            .error-box strong {
+                display: block;
+                margin-bottom: 8px;
+                color: #7f1d1d;
+            }
+
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Processing Failed</h2>
+        </div>
+        <div class="content">
+            <p>Hello <strong>{{Username}}</strong>,</p>
+            <p>We encountered an unexpected error while attempting to process your video batch.</p>
+            <p>Batch Reference: <br> <span class="batch-id">{{BatchId}}</span></p>
+            <div class="error-box">
+                <strong>Error Diagnostic:</strong>
+                {{ErrorMessage}}
+            </div>
+            <p>Please review the error details and try submitting your request again.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 FIAP X Platform. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

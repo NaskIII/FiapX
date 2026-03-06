@@ -19,6 +19,8 @@ public static class DependencyInjection
         services.AddScoped<IProcessVideoUseCase, ProcessVideoUseCase>();
         services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
         services.AddScoped<ILoginUseCase, LoginUseCase>();
+        services.AddScoped<INotifyBatchProcessingResultUseCase, NotifyBatchProcessingResultUseCase>();
+        services.AddScoped<IDownloadBatchZipUseCase, DownloadBatchZipUseCase>();
 
         return services;
     }
