@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FiapX.Application.Interfaces;
 using FiapX.Core.Interfaces.Notifications;
 using FiapX.Core.Interfaces.Repositories;
+using FiapX.Core.Interfaces.Security;
 using Microsoft.Extensions.Logging;
 
 namespace FiapX.Application.UseCases.Batch
@@ -12,17 +13,20 @@ namespace FiapX.Application.UseCases.Batch
         private readonly IUserRepository _userRepository;
         private readonly IEmailTemplateService _templateService;
         private readonly IEmailNotificationService _emailService;
+        private readonly ITokenService _tokenService;
         private readonly ILogger<NotifyBatchProcessingResultUseCase> _logger;
 
         public NotifyBatchProcessingResultUseCase(
             IUserRepository userRepository,
             IEmailTemplateService templateService,
             IEmailNotificationService emailService,
+            ITokenService tokenService,
             ILogger<NotifyBatchProcessingResultUseCase> logger)
         {
             _userRepository = userRepository;
             _templateService = templateService;
             _emailService = emailService;
+            _tokenService = tokenService;
             _logger = logger;
         }
 
@@ -37,8 +41,10 @@ namespace FiapX.Application.UseCases.Batch
                 return;
             }
 
+            string generatedToken = _tokenService.GenerateToken(user);
+
             string subject = $"FiapX - Batch {batchId} Processed Successfully";
-            string htmlBody = await _templateService.GetSuccessEmailTemplateAsync(user.Username, batchId.ToString());
+            string htmlBody = await _templateService.GetSuccessEmailTemplateAsync(user.Username, batchId.ToString(), generatedToken);
 
             await _emailService.SendEmailAsync(user.Email, subject, htmlBody);
         }

@@ -95,7 +95,6 @@ public static class DependencyInjection
 
         services.AddSingleton(x =>
         {
-            var settings = x.GetRequiredService<FiapXSettings>();
 
             return new EmailClient(settings.AzureCommunicationServices.ConnectionString);
         });

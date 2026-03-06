@@ -8,12 +8,12 @@ namespace FiapX.Infrastructure.Services
 
         private readonly FiapXSettings _settings = settings;
 
-        public async Task<string> GetSuccessEmailTemplateAsync(string username, string batchId)
+        public async Task<string> GetSuccessEmailTemplateAsync(string username, string batchId, string generatedToken)
         {
             string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Emails", "SuccessEmail.html");
             string template = await File.ReadAllTextAsync(templatePath);
 
-            string downloadUrl = $"{_settings.SystemUrl}/api/batches/{batchId}";
+            string downloadUrl = $"{_settings.SystemUrl}/api/batches/{batchId}/download?access_token={generatedToken}";
 
             return template
                 .Replace("{{Username}}", username)

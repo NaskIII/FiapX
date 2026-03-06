@@ -1,18 +1,106 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            background-color: #0f172a;
+            padding: 24px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+            .header h2 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 600;
+            }
+
+        .content {
+            padding: 32px;
+            color: #334155;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+            .content p {
+                margin-top: 0;
+                margin-bottom: 16px;
+            }
+
+        .batch-id {
+            background-color: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+
+        .button {
+            background-color: #2563eb;
+            color: #ffffff;
+            padding: 14px 28px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; color: #333;">
-    <h2>Hello {{Username}},</h2>
-    <p>Your video batch <strong>{{BatchId}}</strong> has been successfully processed!</p>
-    <p>You can download your processed files using the link below:</p>
-    <div style="margin: 20px 0;">
-        <a href="{{DownloadUrl}}" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-            Download Videos
-        </a>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Video Processing Complete</h2>
+        </div>
+        <div class="content">
+            <p>Hello <strong>{{Username}}</strong>,</p>
+            <p>Your video batch has been successfully processed and is ready for download.</p>
+            <p>Batch Reference: <span class="batch-id">{{BatchId}}</span></p>
+            <div class="button-container">
+                <a href="{{DownloadUrl}}" class="button">Download ZIP Archive</a>
+            </div>
+            <p style="font-size: 14px; color: #64748b; text-align: center; margin-top: 24px;">
+                This link is authenticated with your secure token.
+            </p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 FIAP X Platform. All rights reserved.</p>
+        </div>
     </div>
-    <p style="font-size: 12px; color: #777;">This link is valid for a limited time.</p>
-    <p>Thank you,<br />FiapX Team</p>
 </body>
 </html>

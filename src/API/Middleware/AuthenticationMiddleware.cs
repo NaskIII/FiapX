@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 
 namespace FiapX.API.Middleware
 {
@@ -34,9 +35,17 @@ namespace FiapX.API.Middleware
 
             string? token = null;
 
-            if (req != null && req.Headers.TryGetValues("Authorization", out var values))
+            if (req != null)
             {
-                token = values.FirstOrDefault()?.Replace("Bearer ", "");
+                if (req.Headers.TryGetValues("Authorization", out var values))
+                {
+                    token = values.FirstOrDefault()?.Replace("Bearer ", "");
+                }
+                else if (req.Url.AbsolutePath.EndsWith("/download", StringComparison.OrdinalIgnoreCase))
+                {
+                    var query = HttpUtility.ParseQueryString(req.Url.Query);
+                    token = query["access_token"];
+                }
             }
 
             var principal = ValidateToken(token);

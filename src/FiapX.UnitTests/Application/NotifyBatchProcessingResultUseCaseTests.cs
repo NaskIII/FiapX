@@ -2,6 +2,7 @@
 using FiapX.Core.Entities;
 using FiapX.Core.Interfaces.Notifications;
 using FiapX.Core.Interfaces.Repositories;
+using FiapX.Core.Interfaces.Security;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -13,6 +14,7 @@ namespace FiapX.UnitTests.Application
         private readonly Mock<IEmailTemplateService> _templateServiceMock;
         private readonly Mock<IEmailNotificationService> _emailServiceMock;
         private readonly Mock<ILogger<NotifyBatchProcessingResultUseCase>> _loggerMock;
+        private readonly Mock<ITokenService> _tokenServiceMock;
         private readonly NotifyBatchProcessingResultUseCase _useCase;
 
         public NotifyBatchProcessingResultUseCaseTests()
@@ -21,11 +23,13 @@ namespace FiapX.UnitTests.Application
             _templateServiceMock = new Mock<IEmailTemplateService>();
             _emailServiceMock = new Mock<IEmailNotificationService>();
             _loggerMock = new Mock<ILogger<NotifyBatchProcessingResultUseCase>>();
+            _tokenServiceMock = new Mock<ITokenService>();
 
             _useCase = new NotifyBatchProcessingResultUseCase(
                 _userRepoMock.Object,
                 _templateServiceMock.Object,
                 _emailServiceMock.Object,
+                _tokenServiceMock.Object,
                 _loggerMock.Object);
         }
 
@@ -36,11 +40,15 @@ namespace FiapX.UnitTests.Application
             var batchId = Guid.NewGuid();
             var user = new User("TestUser", "test@domain.com", "hash");
             var expectedTemplate = "<html>Success</html>";
+            var expectedToken = "generatedtoken";
 
             _userRepoMock.Setup(r => r.GetByIdAsync(userId))
                          .ReturnsAsync(user);
 
-            _templateServiceMock.Setup(t => t.GetSuccessEmailTemplateAsync(user.Username, batchId.ToString()))
+            _tokenServiceMock.Setup(t => t.GenerateToken(user))
+                             .Returns(expectedToken);
+
+            _templateServiceMock.Setup(t => t.GetSuccessEmailTemplateAsync(user.Username, batchId.ToString(), expectedToken))
                                 .ReturnsAsync(expectedTemplate);
 
             await _useCase.ExecuteSuccessAsync(userId, batchId);
@@ -56,13 +64,17 @@ namespace FiapX.UnitTests.Application
         {
             var userId = Guid.NewGuid();
             var batchId = Guid.NewGuid();
+            var generatedToken = "generatedtoken";
 
             _userRepoMock.Setup(r => r.GetByIdAsync(userId))
                          .ReturnsAsync((User?)null);
 
+            _tokenServiceMock.Setup(t => t.GenerateToken(It.IsAny<User>()))
+                             .Returns(generatedToken);
+
             await _useCase.ExecuteSuccessAsync(userId, batchId);
 
-            _templateServiceMock.Verify(t => t.GetSuccessEmailTemplateAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _templateServiceMock.Verify(t => t.GetSuccessEmailTemplateAsync(It.IsAny<string>(), It.IsAny<string>(), generatedToken), Times.Never);
 
             _emailServiceMock.Verify(e => e.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }

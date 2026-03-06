@@ -20,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
         services.AddScoped<ILoginUseCase, LoginUseCase>();
         services.AddScoped<INotifyBatchProcessingResultUseCase, NotifyBatchProcessingResultUseCase>();
+        services.AddScoped<IDownloadBatchZipUseCase, DownloadBatchZipUseCase>();
 
         return services;
     }
