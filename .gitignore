@@ -13,7 +13,6 @@ packages/
 local.settings.json
 appsettings.local.json
 
-data/
 .docker/
 
 *.log
@@ -66,3 +65,4 @@ Report/
 reports/
 
 *.html
+!src/Infrastructure/Resources/Emails/*
