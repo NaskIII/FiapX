@@ -40,10 +40,16 @@ jobs:
         run: dotnet publish ${{ env.WORKER_PROJECT_PATH }} -c Release -o ./publish-worker
         
       - name: Zip API Artifact
-        run: zip -r api.zip ./publish-api/*
+        run: |
+          cd ./publish-api
+          zip -r ../api.zip .
+          cd ..
 
       - name: Zip Worker Artifact
-        run: zip -r worker.zip ./publish-worker/*
+        run: |
+          cd ./publish-worker
+          zip -r ../worker.zip .
+          cd ..
 
       - name: Upload API Artifact
         uses: actions/upload-artifact@v4
