@@ -16,6 +16,7 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -34,20 +35,20 @@ jobs:
         run: dotnet test src/FiapX.UnitTests/FiapX.UnitTests.csproj --configuration Release --no-build --verbosity normal
 
       - name: Publish API
-        run: dotnet publish ${{ env.API_PROJECT_PATH }} -c Release -o ./publish-api
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} -c Release -o publish-api
 
       - name: Publish Worker
-        run: dotnet publish ${{ env.WORKER_PROJECT_PATH }} -c Release -o ./publish-worker
-        
+        run: dotnet publish ${{ env.WORKER_PROJECT_PATH }} -c Release -o publish-worker
+
       - name: Zip API Artifact
         run: |
-          cd ./publish-api
+          cd publish-api
           zip -r ../api.zip .
           cd ..
 
       - name: Zip Worker Artifact
         run: |
-          cd ./publish-worker
+          cd publish-worker
           zip -r ../worker.zip .
           cd ..
 
@@ -66,27 +67,30 @@ jobs:
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         include:
-          - app_name: 'func-fiapx-api'
-            artifact: 'api-zip'
-            package_file: 'api.zip'
-            secret_name: 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_API'
-          - app_name: 'func-fiapx-worker'
-            artifact: 'worker-zip'
-            package_file: 'worker.zip'
-            secret_name: 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_WORKER'
-    
+          - app_name: func-fiapx-api
+            artifact: api-zip
+            package_file: api.zip
+            secret_name: AZURE_FUNCTIONAPP_PUBLISH_PROFILE_API
+
+          - app_name: func-fiapx-worker
+            artifact: worker-zip
+            package_file: worker.zip
+            secret_name: AZURE_FUNCTIONAPP_PUBLISH_PROFILE_WORKER
+
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.artifact }}
+          path: .
 
-      - name: Deploy to Azure
-        uses: Azure/functions-action@v1
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v2
         with:
           app-name: ${{ matrix.app_name }}
-          package: ${{ matrix.package_file }}
+          package: ./${{ matrix.package_file }}
           publish-profile: ${{ secrets[matrix.secret_name] }}
