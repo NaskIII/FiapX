@@ -10,8 +10,8 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
-  API_PACKAGE_PATH: 'src/API/FiapX.API.csproj'
-  WORKER_PACKAGE_PATH: 'src/Worker/FiapX.Worker.csproj'
+  API_PROJECT_PATH: 'src/API/FiapX.API.csproj'
+  WORKER_PROJECT_PATH: 'src/Worker/FiapX.Worker.csproj'
 
 jobs:
   build-and-test:
@@ -34,22 +34,28 @@ jobs:
         run: dotnet test src/FiapX.UnitTests/FiapX.UnitTests.csproj --configuration Release --no-build --verbosity normal
 
       - name: Publish API
-        run: dotnet publish ${{ env.API_PACKAGE_PATH }} -c Release -o ./publish-api
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} -c Release -o ./publish-api
 
       - name: Publish Worker
-        run: dotnet publish ${{ env.WORKER_PACKAGE_PATH }} -c Release -o ./publish-worker
+        run: dotnet publish ${{ env.WORKER_PROJECT_PATH }} -c Release -o ./publish-worker
+        
+      - name: Zip API Artifact
+        run: zip -r api.zip ./publish-api/*
+
+      - name: Zip Worker Artifact
+        run: zip -r worker.zip ./publish-worker/*
 
       - name: Upload API Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: api-app
-          path: ./publish-api
+          name: api-zip
+          path: api.zip
 
       - name: Upload Worker Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: worker-app
-          path: ./publish-worker
+          name: worker-zip
+          path: worker.zip
 
   deploy:
     needs: build-and-test
@@ -58,10 +64,12 @@ jobs:
       matrix:
         include:
           - app_name: 'func-fiapx-api'
-            artifact: 'api-app'
+            artifact: 'api-zip'
+            package_file: 'api.zip'
             secret_name: 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_API'
           - app_name: 'func-fiapx-worker'
-            artifact: 'worker-app'
+            artifact: 'worker-zip'
+            package_file: 'worker.zip'
             secret_name: 'AZURE_FUNCTIONAPP_PUBLISH_PROFILE_WORKER'
     
     steps:
@@ -69,11 +77,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ./app
 
       - name: Deploy to Azure
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ matrix.app_name }}
-          package: ./app
+          package: ${{ matrix.package_file }}
           publish-profile: ${{ secrets[matrix.secret_name] }}
