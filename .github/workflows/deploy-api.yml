@@ -63,6 +63,12 @@ jobs:
         with:
           name: worker-zip
           path: worker.zip
+        
+      - name: Inspect ZIP
+        run: unzip -l api.zip
+
+      - name: Inspect Worker ZIP
+        run: unzip -l worker.zip
 
   deploy:
     needs: build-and-test
